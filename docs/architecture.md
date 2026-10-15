@@ -2,12 +2,12 @@
 
 ## Boundaries
 
-- `core`: shared domain models and contracts. Keep it provider-neutral and lightweight.
+- `core`: shared domain models and contracts. `Document` and `RetrievalResult` are provider-neutral. The current `core.models` module also contains direct OpenAI and Groq chat clients; these require their respective SDKs.
 - `rag`: retrieval, reranking, context assembly, generation, and evaluation components.
 - `agents`: tools and agent workflows that can compose RAG components.
-- Integrations: provider-specific adapters, grouped by capability or provider as the codebase grows. They must not be required to import the core package.
+- Future integrations: provider-specific adapters, grouped by capability or provider as the codebase grows.
 
-The current implementation only establishes initial domain models and protocols. The directory boundaries are a guide, not a promise that every planned subsystem already exists.
+The current implementation includes initial domain models, protocols, and basic OpenAI/Groq chat clients. The directory boundaries are a guide, not a promise that every planned subsystem already exists. See the [Provider chat clients guide](provider-clients.md) for their usage and API.
 
 ## Design constraints
 

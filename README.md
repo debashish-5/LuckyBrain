@@ -22,10 +22,12 @@ python -m pip install -e ".[dev]"
 python -m pytest
 ```
 
-The first domain types are deliberately lightweight:
+The core models and provider chat clients are available now. The domain types
+are deliberately lightweight:
 
 ```python
 from luckybrain import Document, RetrievalResult
+from luckybrain.core.models import OpenaiBrain
 
 document = Document(
     id="guide-1",
@@ -33,19 +35,25 @@ document = Document(
     metadata={"source": "guide.md"},
 )
 result = RetrievalResult(document=document, score=0.92)
+
+brain = OpenaiBrain()  # Reads OPENAI_API_KEY from the environment.
+answer = brain.invoke("Summarize the retrieved passage.")
 ```
 
-The interfaces in `luckybrain.rag` and `luckybrain.agents` are extension points, not bundled model or database integrations. Integrations and end-to-end pipelines will be added with tests and documented behavior.
+For OpenAI and Groq setup, client arguments, streaming, and conversation-history
+behavior, see the [Provider chat clients guide](docs/provider-clients.md).
+The interfaces in `luckybrain.rag` and `luckybrain.agents` remain extension
+points; a complete RAG pipeline and database integrations are not included yet.
 
 ## Project map
 
 ```text
 src/luckybrain/
-  core/       Shared domain types
+  core/       Domain types and OpenAI/Groq chat clients
   rag/        Retrieval and generation contracts
   agents/     Agent tool contracts
 tests/        Automated tests
-docs/         Architecture and roadmap
+docs/         Architecture, provider guide, and roadmap
 ```
 
 See [Architecture](docs/architecture.md), [Roadmap](docs/roadmap.md), and [Contributing](CONTRIBUTING.md) to help shape the project.
