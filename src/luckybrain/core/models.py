@@ -1,10 +1,14 @@
 """Provider-neutral domain models shared across components."""
 
+import os
+from collections.abc import Iterator, Mapping
 from dataclasses import dataclass, field
-from collections.abc import Mapping
-from openai import OpenAI
+
 from groq import Groq
-import os 
+from groq.types.chat import ChatCompletionMessageParam as GroqChatCompletionMessageParam
+from openai import OpenAI
+from openai.types.chat import ChatCompletionMessageParam as OpenAIChatCompletionMessageParam
+
 
 @dataclass(frozen=True, slots=True)
 class Document:
@@ -29,61 +33,77 @@ class RetrievalResult:
     score: float
 
 
-class OpenaiBrain: 
-    def __init__(self, model:str= "gpt-4o-mini", temperature:float | None= None, api_key :str = None, system_prompt:str="You are a helpful assistant."): 
+class OpenaiBrain:
+    def __init__(
+        self,
+        model: str = "gpt-4o-mini",
+        temperature: float | None = None,
+        api_key: str | None = None,
+        system_prompt: str = "You are a helpful assistant.",
+    ) -> None:
         self.client = OpenAI(api_key=api_key)
         self.model = model
         self.temperature = temperature
-        self.history = [{'role':'system','content':system_prompt}]
+        self.history: list[OpenAIChatCompletionMessageParam] = [
+            {"role": "system", "content": system_prompt}
+        ]
 
-    def invoke(self,prompt:str) -> str: 
-        self.history.append({'role':'user','content':prompt})
+    def invoke(self, prompt: str) -> str:
+        self.history.append({"role": "user", "content": prompt})
         response = self.client.chat.completions.create(
-            model = self.model, 
-            temperature=self.temperature, 
-            messages=self.history
+            model=self.model, temperature=self.temperature, messages=self.history
         )
         answer = response.choices[0].message.content
-        self.history.append({'role':'assistant', 'content':answer})
+        if answer is None:
+            raise RuntimeError("The OpenAI response did not contain text.")
+        self.history.append({"role": "assistant", "content": answer})
         return answer
 
-    def stream(self, prompt:str): 
+    def stream(self, prompt: str) -> Iterator[str]:
         stream = self.client.chat.completions.create(
-            model = self.model, 
-            temperature=self.temperature, 
-            messages=self.history + [{'role':'user','content':prompt}], 
-            stream=True
-        )
-        for chunk in stream: 
-            if chunk or chunk.choices[0].delta.content:
-                yield chunk.choices[0].delta.content 
-
-
-
-
-class GroqBrain: 
-    def __init__(self, model:str = "llama-3.3-70b-versatile", temperature:float | None = None, api_key=None,system_prompt:str = "You are a helpful assistant."): 
-        self.client  = Groq(api_key=api_key or os.getenv("GROQ_API_KEY"))
-        self.model = model
-        self.temperature = temperature
-        self.history = [{'role':'system','content':system_prompt}]
-    def invoke(self,prompt:str): 
-        self.history.append({'role':'user','content':prompt})
-        response = self.client.chat.completions.create(
-            model = self.model, 
-            temperature=self.temperature, 
-            messages=self.history
-        )
-        answer = response.choices[0].message.content
-        self.history.append({'role':'assistant', 'content':answer})
-        return answer
-    def stream(self, prompt:str): 
-        stream = self.client.chat.completions.create(
-            model=self.model, 
-            temperature=self.temperature, 
-            messages= self.history + [{'role':'user', 'content':prompt}], 
-            stream=True
+            model=self.model,
+            temperature=self.temperature,
+            messages=self.history + [{"role": "user", "content": prompt}],
+            stream=True,
         )
         for chunk in stream:
-            if chunk.choices and chunk.choices[0].delta.content: 
-                yield chunk.choices[0].delta.content
+            if chunk.choices and (content := chunk.choices[0].delta.content) is not None:
+                yield content
+
+
+class GroqBrain:
+    def __init__(
+        self,
+        model: str = "llama-3.3-70b-versatile",
+        temperature: float | None = None,
+        api_key: str | None = None,
+        system_prompt: str = "You are a helpful assistant.",
+    ) -> None:
+        self.client = Groq(api_key=api_key or os.getenv("GROQ_API_KEY"))
+        self.model = model
+        self.temperature = temperature
+        self.history: list[GroqChatCompletionMessageParam] = [
+            {"role": "system", "content": system_prompt}
+        ]
+
+    def invoke(self, prompt: str) -> str:
+        self.history.append({"role": "user", "content": prompt})
+        response = self.client.chat.completions.create(
+            model=self.model, temperature=self.temperature, messages=self.history
+        )
+        answer = response.choices[0].message.content
+        if answer is None:
+            raise RuntimeError("The Groq response did not contain text.")
+        self.history.append({"role": "assistant", "content": answer})
+        return answer
+
+    def stream(self, prompt: str) -> Iterator[str]:
+        stream = self.client.chat.completions.create(
+            model=self.model,
+            temperature=self.temperature,
+            messages=self.history + [{"role": "user", "content": prompt}],
+            stream=True,
+        )
+        for chunk in stream:
+            if chunk.choices and (content := chunk.choices[0].delta.content) is not None:
+                yield content
