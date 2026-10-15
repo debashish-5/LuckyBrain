@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 from collections.abc import Mapping
-
+from openai import OpenAI
 
 @dataclass(frozen=True, slots=True)
 class Document:
@@ -25,3 +25,38 @@ class RetrievalResult:
 
     document: Document
     score: float
+
+
+class OpenaiBrain: 
+    def __init__(self, model:str= "gpt-4o-mini", temperature:float | None= None, api_key :str = None, system_prompt:str="You are a helpful assistant."): 
+        self.client = OpenAI(api_key=api_key)
+        self.model = model
+        self.temperature = temperature
+        self.history = [{'role':'system','content':system_prompt}]
+
+    def invoke(self,prompt:str) -> str: 
+        self.history.append({'role':'user','content':prompt})
+        response = self.client.chat.completions.create(
+            model = self.model, 
+            temperature=self.temperature, 
+            messages=self.history
+        )
+        answer = response.choices[0].message.content
+        self.history.append({'role':'assistant', 'content':answer})
+        return answer
+
+    def stream(self, prompt:str): 
+        stream = self.client.chat.completions.create(
+            model = self.model, 
+            temperature=self.temperature, 
+            messages=self.history + [{'role':'user','content':prompt}], 
+            stream=True
+        )
+        for chunk in stream: 
+            if chunk or chunk.choices[0].delta.content:
+                yield chunk.choices[0].delta.content 
+            
+
+
+
+
