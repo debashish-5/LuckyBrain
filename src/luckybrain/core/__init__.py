@@ -3,4 +3,3 @@
 from luckybrain.core.models import Document, RetrievalResult
 
 __all__ = ["Document", "RetrievalResult"]
-
