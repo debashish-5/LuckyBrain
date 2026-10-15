@@ -3,6 +3,8 @@
 from dataclasses import dataclass, field
 from collections.abc import Mapping
 from openai import OpenAI
+from groq import Groq
+import os 
 
 @dataclass(frozen=True, slots=True)
 class Document:
@@ -55,8 +57,33 @@ class OpenaiBrain:
         for chunk in stream: 
             if chunk or chunk.choices[0].delta.content:
                 yield chunk.choices[0].delta.content 
-            
 
 
 
 
+class GroqBrain: 
+    def __init__(self, model:str = "llama-3.3-70b-versatile", temperature:float | None = None, api_key=None,system_prompt:str = "You are a helpful assistant."): 
+        self.client  = Groq(api_key=api_key or os.getenv("GROQ_API_KEY"))
+        self.model = model
+        self.temperature = temperature
+        self.history = [{'role':'system','content':system_prompt}]
+    def invoke(self,prompt:str): 
+        self.history.append({'role':'user','content':prompt})
+        response = self.client.chat.completions.create(
+            model = self.model, 
+            temperature=self.temperature, 
+            messages=self.history
+        )
+        answer = response.choices[0].message.content
+        self.history.append({'role':'assistant', 'content':answer})
+        return answer
+    def stream(self, prompt:str): 
+        stream = self.client.chat.completions.create(
+            model=self.model, 
+            temperature=self.temperature, 
+            messages= self.history + [{'role':'user', 'content':prompt}], 
+            stream=True
+        )
+        for chunk in stream:
+            if chunk.choices and chunk.choices[0].delta.content: 
+                yield chunk.choices[0].delta.content
