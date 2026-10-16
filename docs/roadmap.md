@@ -22,8 +22,15 @@ This roadmap records direction, not delivery promises. Issues and design discuss
 - [ ] Compose agents with retrieval without making a specific orchestration vendor mandatory.
 - [ ] Add safeguards, traceability, and reproducible tests for tool execution.
 
+## Multimodal and integrations
+
+- [ ] Explore provider-neutral contracts for image, audio, video, and mixed-media inputs and outputs.
+- [ ] Define how media validation, parsing, representations, and provenance fit with retrieval and generation.
+- [ ] Add integrations as optional adapters with documented data handling and failure behavior.
+
 ## Quality and community
 
 - [ ] Publish design proposals for major public abstractions.
 - [ ] Add examples only when they exercise supported APIs end to end.
-- [ ] Document security and privacy behavior for each integration before recommending production use.
+- [ ] Establish repeatable quality, latency, and cost evaluation for supported components.
+- [ ] Document security, privacy, retention, and permission behavior for each integration before recommending production use.
