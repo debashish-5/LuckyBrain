@@ -1,33 +1,49 @@
 # LuckyBrain
 
-**Open foundations for retrieval-augmented generation and agent systems.**
+**Open, composable foundations for building AI systems.**
 
-LuckyBrain is an open-source Python project for building reliable, inspectable, and composable RAG components, with agent capabilities as a closely related part of the system. The long-term goal is ambitious; the project today is intentionally at its beginning.
+LuckyBrain is an early-stage Python project exploring the building blocks behind
+retrieval-augmented generation (RAG), agents, multimodal applications, and the
+systems that connect them. It aims to make components understandable,
+replaceable, testable, and safer to build with—without tying the project to one
+provider or one fixed architecture.
 
-> **Status: early development.** The current code provides small domain models and extension protocols. It is not yet a production RAG or agent framework, and its public API may change.
+> **Project status: alpha.** Today the package contains lightweight domain
+> models, extension protocols, and synchronous OpenAI and Groq chat clients.
+> Complete RAG, agent, and multimodal pipelines are not implemented. APIs and
+> architecture may change as the project develops.
 
-## What we are building
+## What belongs here?
 
-- **RAG first:** clear interfaces for retrieval, reranking, context construction, and generation.
-- **Agents that compose:** tools and agent workflows that can use the same retrieval components.
-- **Useful defaults, replaceable parts:** work with different models, vector stores, and data sources without locking users into one vendor.
-- **Reliability over demos:** make behavior testable, observable, secure, and understandable before adding more abstractions.
+AI applications are more than a single RAG pipeline. LuckyBrain is open to
+well-scoped contributions across the full lifecycle:
 
-## Start here
+| Area | Examples |
+| --- | --- |
+| **Knowledge and retrieval** | Data connectors, parsing, chunking, embeddings, indexes, search, reranking, citations, and evaluation |
+| **Multimodal systems** | Image, audio, video, and mixed-media inputs; extraction, representations, retrieval, and generated outputs |
+| **Agents and tools** | Tool contracts, orchestration, memory, state, permissions, and human approval |
+| **Models and integrations** | Provider adapters, local models, storage backends, and interoperability |
+| **Quality and operations** | Testing, benchmarks, tracing, observability, privacy, security, and deployment guidance |
 
-Requirements: Python 3.11 or newer. From a checkout, install the development dependencies and run the tests:
+These are areas to explore, not a promise that the capabilities already exist.
+See [Architecture](docs/architecture.md) for design principles and current
+boundaries, and the [Roadmap](docs/roadmap.md) for ideas under consideration.
+
+## Try the current package
+
+Requires Python 3.11 or newer. Install the package and its development tools,
+then run the tests:
 
 ```bash
 python -m pip install -e ".[dev]"
 python -m pytest
 ```
 
-The core models and provider chat clients are available now. The domain types
-are deliberately lightweight:
+The current public domain models are deliberately small:
 
 ```python
 from luckybrain import Document, RetrievalResult
-from luckybrain.core.models import OpenaiBrain
 
 document = Document(
     id="guide-1",
@@ -35,36 +51,54 @@ document = Document(
     metadata={"source": "guide.md"},
 )
 result = RetrievalResult(document=document, score=0.92)
-
-brain = OpenaiBrain()  # Reads OPENAI_API_KEY from the environment.
-answer = brain.invoke("Summarize the retrieved passage.")
 ```
 
-For OpenAI and Groq setup, client arguments, streaming, and conversation-history
-behavior, see the [Provider chat clients guide](docs/provider-clients.md).
-The interfaces in `luckybrain.rag` and `luckybrain.agents` remain extension
-points; a complete RAG pipeline and database integrations are not included yet.
+The package also includes synchronous OpenAI and Groq chat clients. They make
+provider API calls; the example above does not perform retrieval or generate an
+answer. See the [Provider chat clients guide](docs/provider-clients.md) for
+setup and usage. Keep API keys out of source code and use environment variables
+or a secret manager.
 
-## Project map
+## A flexible project, not a fixed folder map
+
+The current layout is a starting point, not a rule that every contribution must
+fit an existing directory:
 
 ```text
-src/luckybrain/
-  core/       Domain types and OpenAI/Groq chat clients
-  rag/        Retrieval and generation contracts
-  agents/     Agent tool contracts
-tests/        Automated tests
-docs/         Architecture, provider guide, and roadmap
+src/luckybrain/   Python package and current extension points
+tests/            Automated tests
+docs/             Architecture, provider guide, and roadmap
 ```
 
-See [Architecture](docs/architecture.md), [Roadmap](docs/roadmap.md), and [Contributing](CONTRIBUTING.md) to help shape the project.
+Contributors can propose new packages, folders, capabilities, integrations, or
+documentation when they solve a clear problem. Keep boundaries understandable,
+dependencies intentional, and additions covered by tests. See
+[Contributing](CONTRIBUTING.md) for how to shape and submit changes.
 
-## Project principles
+## Principles
 
-1. Keep core interfaces small, typed, and independent of specific providers.
-2. Make advanced behavior explicit and measurable; do not hide retrieval or agent decisions behind magic defaults.
-3. Treat evaluation, citations/provenance, observability, and security as core engineering concerns.
-4. Prefer interoperable standards and adapters over one-off integrations.
-5. Add complexity only when a real use case and tests justify it.
+- **Composable:** keep components small, typed, and independently replaceable.
+- **Provider-neutral:** make integrations adapters rather than architectural
+  requirements.
+- **Observable and evaluable:** make decisions, failures, provenance, and
+  quality measurable.
+- **Secure and privacy-aware:** treat prompts, documents, media, credentials,
+  model responses, and tools as trust boundaries.
+- **Evidence-led:** distinguish implemented behavior from proposals, and prefer
+  tested use cases over speculative abstractions.
+
+## Security
+
+LuckyBrain is alpha software, not a security certification. Do not put real
+credentials, private data, or sensitive production workloads through it
+without reviewing the code and every integration you use. For reporting
+vulnerabilities, see [Security Policy](SECURITY.md).
+
+## Contribute
+
+Questions, bug reports, tests, documentation, design proposals, and new
+capabilities are welcome. Start with [Contributing](CONTRIBUTING.md), and follow
+the community standards in [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
