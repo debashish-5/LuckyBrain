@@ -40,18 +40,6 @@ python -m pip install -e ".[dev]"
 python -m pytest
 ```
 
-The current public domain models are deliberately small:
-
-```python
-from luckybrain import Document, RetrievalResult
-
-document = Document(
-    id="guide-1",
-    content="A source passage to retrieve.",
-    metadata={"source": "guide.md"},
-)
-result = RetrievalResult(document=document, score=0.92)
-```
 
 The package also includes synchronous OpenAI and Groq chat clients. They make
 provider API calls; the example above does not perform retrieval or generate an
@@ -102,4 +90,9 @@ the community standards in [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
-LuckyBrain is licensed under the MIT License. See [LICENSE](LICENSE).
+LuckyBrain is licensed under the MIT License. This allows reuse and forks,
+including commercial derivatives, provided the required license and copyright
+notices are retained; it does not prevent others from building a competing
+project from the code. See [LICENSE](LICENSE) and the contribution guide's
+[copyright and attribution notes](CONTRIBUTING.md#copyright-license-and-attribution)
+for details.
