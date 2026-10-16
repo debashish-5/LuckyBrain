@@ -8,7 +8,31 @@ from groq import Groq
 from groq.types.chat import ChatCompletionMessageParam as GroqChatCompletionMessageParam
 from openai import OpenAI
 from openai.types.chat import ChatCompletionMessageParam as OpenAIChatCompletionMessageParam
+from typing import Protocol, List, Dict, Any, Optional
 
+
+from abc import ABC, abstractmethod
+
+class BaseChatModel(ABC): 
+    """An abstract base class that enforces common configurations."""
+    def __init__(self, model:str, api_key:Optional[str] = None, temperature:float = None, **kwargs:Any) -> None: 
+        self.model:str = model
+        self.temperature:float = temperature
+        self.additional_params:Dict[str, Any] = kwargs
+        self.client:Any = None
+
+    @abstractmethod
+    def think(self,messages:str | list[Dict[str,str]]):
+        """Every child class MUST override and implement this specific method."""
+        pass
+
+
+class ChatModelProtocol(Protocol): 
+    def think(self,messages:str | List[Dict[str, str]]): 
+        ...
+
+
+    
 
 @dataclass(frozen=True, slots=True)
 class Document:
@@ -48,8 +72,8 @@ class OpenaiBrain:
             {"role": "system", "content": system_prompt}
         ]
 
-    def think(self, prompt: str) -> str:
-        self.history.append({"role": "user", "content": prompt})
+    def think(self, messages: str | List[Dict[str,str]]) -> str:
+        self.history.append({"role": "user", "content": messages})
         response = self.client.chat.completions.create(
             model=self.model, temperature=self.temperature, messages=self.history
         )
@@ -59,11 +83,11 @@ class OpenaiBrain:
         self.history.append({"role": "assistant", "content": answer})
         return answer
 
-    def stream(self, prompt: str) -> Iterator[str]:
+    def stream(self, messages:List[Dict[str,str]]) -> Iterator[str]:
         stream = self.client.chat.completions.create(
             model=self.model,
             temperature=self.temperature,
-            messages=self.history + [{"role": "user", "content": prompt}],
+            messages=self.history + [{"role": "user", "content": messages}],
             stream=True,
         )
         for chunk in stream:
@@ -86,8 +110,8 @@ class GroqBrain:
             {"role": "system", "content": system_prompt}
         ]
 
-    def think(self, prompt: str) -> str:
-        self.history.append({"role": "user", "content": prompt})
+    def think(self, messages:str | List[Dict[str, str]]) -> str:
+        self.history.append({"role": "user", "content": messages})
         response = self.client.chat.completions.create(
             model=self.model, temperature=self.temperature, messages=self.history
         )
@@ -97,11 +121,11 @@ class GroqBrain:
         self.history.append({"role": "assistant", "content": answer})
         return answer
 
-    def stream(self, prompt: str) -> Iterator[str]:
+    def stream(self, messages: str | List[Dict[str,str]]) -> Iterator[str]:
         stream = self.client.chat.completions.create(
             model=self.model,
             temperature=self.temperature,
-            messages=self.history + [{"role": "user", "content": prompt}],
+            messages=self.history + [{"role": "user", "content": messages}],
             stream=True,
         )
         for chunk in stream:
