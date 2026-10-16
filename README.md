@@ -58,9 +58,11 @@ tests/            Automated tests
 docs/             Architecture, provider guide, and roadmap
 ```
 
-Contributors can propose new packages, folders, capabilities, integrations, or
-documentation when they solve a clear problem. Keep boundaries understandable,
-dependencies intentional, and additions covered by tests. See
+Contributors can fix or improve anything in the project, and can add new modules
+and subpackages inside `src/luckybrain/`—they do not have to limit work to the
+existing folders or roadmap. Keep boundaries understandable, dependencies
+intentional, and changes covered by tests. Contributions are submitted as pull
+requests for review. See
 [Contributing](CONTRIBUTING.md) for how to shape and submit changes.
 
 ## Principles

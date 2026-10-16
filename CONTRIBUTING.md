@@ -1,20 +1,22 @@
 # Contributing to LuckyBrain
 
 Thank you for considering a contribution. LuckyBrain is an early-stage project,
-so clear bug reports, focused tests, documentation, design proposals, and code
-are all useful. You do not need to be an expert in RAG or work within an
-existing folder to contribute.
+so clear bug reports, fixes, tests, documentation, design proposals, and new
+features are all useful. You can improve existing code or add new modules and
+capabilities inside `src/luckybrain/`; you do not need to be an expert in RAG
+or work within an existing folder to contribute.
 
 ## Contribution workflow
 
 1. **Get oriented.** Read the [README](README.md), [architecture](docs/architecture.md),
    [roadmap](docs/roadmap.md), and [security policy](SECURITY.md). Check what is
    implemented today; roadmap items are proposals, not existing features.
-2. **Choose an issue or describe your idea.** Search existing issues and pull
-   requests first. Small fixes can go straight to a pull request. For a new
-   feature, new subsystem, dependency, or public API change, open an issue or
-   discussion before investing in a large implementation. Explain the problem,
-   intended users, and why the change belongs in LuckyBrain.
+2. **Choose something to fix or build.** Search existing issues and pull
+   requests first. You can fix a bug, improve code or docs, add tests, or
+   implement a feature. Small and focused fixes can go straight to a pull
+   request. For a new subsystem, dependency, or public API change, open an issue
+   or discussion before investing in a large implementation. Explain the
+   problem, intended users, and why the change belongs in LuckyBrain.
 3. **Agree on the shape for larger work.** Outline alternatives, trade-offs,
    compatibility impact, testing, security, privacy, and data-handling needs.
    Wait for maintainer feedback before making a large change; this helps avoid
@@ -32,9 +34,12 @@ Example branch names: `fix/document-validation`,
 
 ## What can I contribute?
 
-Contributions are not limited to the current package layout or roadmap. You may
-propose new folders, packages, capabilities, integrations, examples, or
-project-wide improvements, including work on:
+You are welcome to make changes within LuckyBrain: fix incorrect or incomplete
+behavior in existing code, improve or reorganize a module, and create new
+modules, subpackages, or capabilities under `src/luckybrain/`. You can also add
+the related tests, documentation, examples, and project-wide improvements.
+Contributions are not restricted to the current folders or roadmap. Possible
+areas include:
 
 - Knowledge sources, parsing, chunking, embeddings, search, retrieval,
   reranking, citations, and evaluation.
@@ -44,10 +49,11 @@ project-wide improvements, including work on:
 - Security, privacy, observability, testing, benchmarks, and documentation.
 
 For new code, give each module a clear responsibility, keep dependencies
-intentional, and explain how it fits the architecture. Do not add a dependency
-or public abstraction without a concrete use case. Clearly label experimental
-behavior and proposals; documentation and examples must not imply that
-unimplemented features work.
+intentional, and explain how it fits the architecture. Corrections are welcome
+too: describe the existing problem, the corrected behavior, and add a
+regression test when practical. Do not add a dependency or public abstraction
+without a concrete use case. Clearly label experimental behavior and proposals;
+documentation and examples must not imply that unimplemented features work.
 
 ## Set up a development environment
 

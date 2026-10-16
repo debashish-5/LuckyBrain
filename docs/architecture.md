@@ -52,10 +52,12 @@ These are possible areas of the architecture, not required top-level folders:
 - **Cross-cutting quality:** testing, reproducibility, tracing, cost and latency
   measurement, privacy, and security.
 
-Contributors may introduce a new package, folder, or capability when it has a
-clear responsibility and fits the project principles. Keep shared interfaces
-provider-neutral where practical, avoid unnecessary dependencies in core, and
-explain important trade-offs in the contribution or design proposal.
+Contributors can correct or improve existing behavior and add new modules,
+subpackages, integrations, or capabilities within `src/luckybrain/`. The
+current folders are a starting point, not a restriction. Give new code a clear
+responsibility, keep shared interfaces provider-neutral where practical, avoid
+unnecessary dependencies in core, and explain important trade-offs in the
+contribution or design proposal.
 
 ## Design constraints
 
