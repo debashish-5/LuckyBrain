@@ -48,7 +48,7 @@ class OpenaiBrain:
             {"role": "system", "content": system_prompt}
         ]
 
-    def invoke(self, prompt: str) -> str:
+    def think(self, prompt: str) -> str:
         self.history.append({"role": "user", "content": prompt})
         response = self.client.chat.completions.create(
             model=self.model, temperature=self.temperature, messages=self.history
@@ -86,7 +86,7 @@ class GroqBrain:
             {"role": "system", "content": system_prompt}
         ]
 
-    def invoke(self, prompt: str) -> str:
+    def think(self, prompt: str) -> str:
         self.history.append({"role": "user", "content": prompt})
         response = self.client.chat.completions.create(
             model=self.model, temperature=self.temperature, messages=self.history
