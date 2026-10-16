@@ -1,25 +1,96 @@
 # Architecture
 
-## Boundaries
+LuckyBrain is intended to support composable AI systems, not prescribe a
+single pipeline or directory structure. RAG is one important use case alongside
+agents, multimodal applications, model and data integrations, evaluation, and
+the operational controls that make these systems dependable.
 
-- `core`: shared domain models and contracts. `Document` and `RetrievalResult` are provider-neutral. The current `core.models` module also contains direct OpenAI and Groq chat clients; these require their respective SDKs.
-- `rag`: retrieval, reranking, context assembly, generation, and evaluation components.
-- `agents`: tools and agent workflows that can compose RAG components.
-- Future integrations: provider-specific adapters, grouped by capability or provider as the codebase grows.
+## Current implementation
 
-The current implementation includes initial domain models, protocols, and basic OpenAI/Groq chat clients. The directory boundaries are a guide, not a promise that every planned subsystem already exists. See the [Provider chat clients guide](provider-clients.md) for their usage and API.
+The package is at an early stage. It currently includes:
+
+- Provider-neutral `Document` and `RetrievalResult` domain models.
+- Asynchronous extension protocols for text retrieval, reranking, and
+  generation in `luckybrain.rag`.
+- An asynchronous tool contract in `luckybrain.agents`.
+- Synchronous OpenAI and Groq chat clients in `luckybrain.core.models`.
+
+These pieces are not a connected application pipeline. In particular, the
+protocols do not provide implementations, and the chat clients do not perform
+retrieval, multimodal processing, agent orchestration, or citation management.
+See the [Provider chat clients guide](provider-clients.md) for current client
+behavior.
+
+## Composable system lifecycle
+
+A future application may connect stages such as:
+
+**Inputs and sources** → **validation and parsing** → **task-specific
+processing** → **representations and storage** → **retrieval or selection** →
+**orchestration and context** → **model or tool execution** → **outputs and
+provenance** → **evaluation and observability**
+
+This is a map of concerns, not a required sequence or implemented pipeline.
+Applications may omit, repeat, combine, or reorder stages. A text search
+application, for example, need not use agents; an audio workflow may need
+transcription before retrieval; and an agent may call a tool without RAG.
+Implementations should keep boundaries explicit so components can be tested
+and replaced independently.
+
+## Capability areas
+
+These are possible areas of the architecture, not required top-level folders:
+
+- **Knowledge and retrieval:** connectors, parsing, chunking, embeddings,
+  indexes, search, reranking, context assembly, citations, and evaluation.
+- **Multimodal:** image, audio, video, and mixed-media input/output, including
+  extraction, transformation, indexing, and retrieval.
+- **Agents and tools:** orchestration, tool schemas, state, memory, permissions,
+  timeouts, and human approval.
+- **Models and infrastructure:** provider adapters, local inference, storage,
+  caching, queues, and deployment.
+- **Cross-cutting quality:** testing, reproducibility, tracing, cost and latency
+  measurement, privacy, and security.
+
+Contributors may introduce a new package, folder, or capability when it has a
+clear responsibility and fits the project principles. Keep shared interfaces
+provider-neutral where practical, avoid unnecessary dependencies in core, and
+explain important trade-offs in the contribution or design proposal.
 
 ## Design constraints
 
-- Define typed contracts at integration boundaries; keep vendor SDK types out of core APIs.
-- Make asynchronous behavior and error handling explicit.
-- Preserve source identity and provenance through retrieval and generation workflows.
-- Make configuration, ranking, and agent decisions inspectable; avoid hidden network calls.
-- Test components with deterministic fakes. Keep live-provider tests opt-in.
-- Add compatibility guarantees only after the API has enough real use to justify them.
+- Keep integrations behind typed, testable boundaries; avoid leaking vendor SDK
+  types into shared contracts.
+- Make synchronous and asynchronous behavior, errors, retries, and resource
+  limits explicit.
+- Preserve source identity and provenance where transformations or generated
+  outputs depend on source material.
+- Treat external content, provider responses, and tool inputs as untrusted.
+- Make model, retrieval, and tool decisions inspectable; avoid hidden network
+  calls and unbounded side effects.
+- Test with deterministic fakes. Keep live-provider tests opt-in and do not
+  require secrets for the normal test suite.
+- Document what is implemented, what is experimental, and what is only
+  proposed. Make compatibility promises deliberately as public APIs mature.
 
-## Proposed RAG flow
+## Security and privacy boundaries
 
-Ingestion and parsing -> chunking -> embedding and indexing -> retrieval -> optional reranking -> context assembly -> generation -> citations and evaluation.
+AI systems can expose data or take unintended actions even when individual
+components work as designed. Architecture and integrations should account for:
 
-This is a conceptual flow, not an implemented pipeline. Each stage should remain independently replaceable and observable.
+- **Credential protection:** read secrets from approved secret stores or
+  environment configuration; never log, return, or commit them.
+- **Data handling:** minimize what is sent to providers, define retention and
+  deletion behavior, and avoid exposing sensitive prompts or content in logs,
+  traces, fixtures, and examples.
+- **Untrusted inputs:** validate documents, URLs, media, and structured tool
+  arguments; consider prompt injection, malicious files, parser limits, and
+  resource exhaustion.
+- **Constrained actions:** give tools least privilege, set timeouts and
+  resource limits, and require explicit approval for consequential actions.
+- **Supply chain:** keep dependencies purposeful and maintained, and review
+  provider and storage integrations as part of the trust boundary.
+
+These are design requirements to build toward, not guarantees provided by the
+current alpha package. See the [Security Policy](../SECURITY.md) for reporting
+suspected vulnerabilities.
