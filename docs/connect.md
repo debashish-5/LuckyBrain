@@ -37,7 +37,7 @@ project; response times and roadmap decisions are not guaranteed.
 
 ## Connect with the maintainer
 
-- **Email:** [debashishparida@gmail.com](mailto:debashishparida@gmail.com)
+- **Email:** [ddebashishparida@gmail.com](mailto:ddebashishparida@gmail.com)
 - **GitHub:** [@debashish-5](https://github.com/debashish-5)
 - **LinkedIn:** [Debashish Parida](https://www.linkedin.com/in/debashish-parida-a260b1355/)
 
