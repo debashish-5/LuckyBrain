@@ -2,6 +2,11 @@
 
 **Open, composable foundations for building AI systems.**
 
+[Project website](https://debashish-5.github.io/LuckyBrain/) ·
+[Documentation](docs/index.md) ·
+[API reference](docs/api-reference.md) ·
+[Connect](docs/connect.md)
+
 LuckyBrain is an early-stage Python project exploring the building blocks behind
 retrieval-augmented generation (RAG), agents, multimodal applications, and the
 systems that connect them. It aims to make components understandable,
@@ -9,9 +14,10 @@ replaceable, testable, and safer to build with—without tying the project to on
 provider or one fixed architecture.
 
 > **Project status: alpha.** Today the package contains lightweight domain
-> models, extension protocols, and synchronous OpenAI and Groq chat clients.
-> Complete RAG, agent, and multimodal pipelines are not implemented. APIs and
-> architecture may change as the project develops.
+> models, extension protocols, synchronous OpenAI and Groq chat clients, and an
+> experimental query-rewriting helper. Complete RAG, agent, and multimodal
+> pipelines are not implemented. APIs and architecture may change as the
+> project develops.
 
 ## What belongs here?
 
@@ -30,6 +36,22 @@ These are areas to explore, not a promise that the capabilities already exist.
 See [Architecture](docs/architecture.md) for design principles and current
 boundaries, and the [Roadmap](docs/roadmap.md) for ideas under consideration.
 
+The [LuckyBrain website](https://debashish-5.github.io/LuckyBrain/) includes
+responsive guides and a Python API reference generated from the source
+docstrings. Every public feature should ship with both source documentation
+and a user guide; see the [contributor documentation](docs/contributing.md).
+
+To preview the documentation site while working on it:
+
+```powershell
+python -m pip install -e ".[docs]"
+python -m mkdocs serve
+```
+
+The CI documentation workflow validates every change and publishes updates
+from `main` to GitHub Pages. The repository's Pages source must be set to
+**GitHub Actions** for the hosted site to be deployed.
+
 ## Try the current package
 
 Requires Python 3.11 or newer. Install the package and its development tools,
@@ -43,9 +65,12 @@ python -m pytest
 
 The package also includes synchronous OpenAI and Groq chat clients. They make
 provider API calls; the example above does not perform retrieval or generate an
-answer. See the [Provider chat clients guide](docs/provider-clients.md) for
-setup and usage. Keep API keys out of source code and use environment variables
-or a secret manager.
+answer. See the [chat models guide](docs/guides/chat-models.md) for setup and
+usage. Keep API keys out of source code and use environment variables or a
+secret manager.
+
+The experimental [query rewriting helper](docs/guides/query-rewriting.md)
+accepts an existing synchronous chat model; it does not perform retrieval.
 
 ## A flexible project, not a fixed folder map
 

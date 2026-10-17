@@ -14,12 +14,15 @@ The package is at an early stage. It currently includes:
   generation in `luckybrain.rag`.
 - An asynchronous tool contract in `luckybrain.agents`.
 - Synchronous OpenAI and Groq chat clients in `luckybrain.core.models`.
+- An experimental model-backed query rewriting helper in
+  `luckybrain.query_imp.queryimproval`.
 
 These pieces are not a connected application pipeline. In particular, the
 protocols do not provide implementations, and the chat clients do not perform
 retrieval, multimodal processing, agent orchestration, or citation management.
-See the [Provider chat clients guide](provider-clients.md) for current client
-behavior.
+See the [chat models guide](guides/chat-models.md), [query rewriting
+guide](guides/query-rewriting.md), and [API reference](api-reference.md) for
+current behavior and boundaries.
 
 ## Composable system lifecycle
 
@@ -94,5 +97,5 @@ components work as designed. Architecture and integrations should account for:
   provider and storage integrations as part of the trust boundary.
 
 These are design requirements to build toward, not guarantees provided by the
-current alpha package. See the [Security Policy](../SECURITY.md) for reporting
+current alpha package. See the [security page](security.md) for reporting
 suspected vulnerabilities.

@@ -43,7 +43,7 @@ brain = OpenaiBrain(
     temperature=0.2,
     system_prompt="Answer clearly and concisely.",
 )
-answer = brain.invoke("What is retrieval-augmented generation?")
+answer = brain.think("What is retrieval-augmented generation?")
 print(answer)
 ```
 
@@ -55,6 +55,10 @@ print(answer)
 | `temperature` | `float \| None` | `None` | Sampling temperature. `None` leaves the provider default in effect. |
 | `api_key` | `str \| None` | `None` | Optional API key passed to the OpenAI SDK. When omitted, the SDK uses its standard `OPENAI_API_KEY` configuration. |
 | `system_prompt` | `str` | `"You are a helpful assistant."` | Initial system message for the conversation. |
+| `max_tokens` | `int \| None` | `None` | Optional response token limit passed to the provider. |
+| `top_p` | `float \| None` | `None` | Optional nucleus-sampling value from greater than 0 through 1. |
+| `base_url` | `str \| None` | `None` | Optional endpoint override for OpenAI-compatible services. |
+| `**additional_params` | provider-specific | — | Extra chat-completion options forwarded to the SDK, such as `seed` or `presence_penalty`. |
 
 ## Groq
 
@@ -66,11 +70,13 @@ brain = GroqBrain(
     temperature=0.2,
     system_prompt="Answer clearly and concisely.",
 )
-answer = brain.invoke("What is retrieval-augmented generation?")
+answer = brain.think("What is retrieval-augmented generation?")
 print(answer)
 ```
 
-`GroqBrain` accepts the same arguments, with these provider-specific details:
+`GroqBrain` accepts the same model, generation, and extra completion options,
+with these provider-specific details (it does not accept OpenAI-specific
+`base_url`):
 
 | Argument | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -85,7 +91,7 @@ Both clients provide the following methods:
 
 | Method | Returns | Behavior |
 | --- | --- | --- |
-| `invoke(prompt: str)` | `str` | Sends a prompt and returns the assistant's complete text response. |
+| `think(prompt: str)` | `str` | Sends a prompt and returns the assistant's complete text response. |
 | `stream(prompt: str)` | `Iterator[str]` | Yields response text as chunks arrive from the provider. |
 
 For example, stream a response with Groq:
@@ -98,21 +104,35 @@ print()
 ```
 
 Each client keeps an in-memory `history` initialized with its system prompt.
-`invoke()` adds the user prompt and returned assistant text to this history, so
-later calls to `invoke()` continue the conversation. `stream()` includes the
-current history and the supplied prompt in its request but does not add either
-the streamed prompt or response to history. It is therefore a one-off request
-unless you separately manage the conversation.
+`think()` adds the prompt and returned assistant text to this history, so
+later calls continue the conversation. It accepts either a string prompt or a
+sequence of text messages with `user`, `assistant`, `system`, or `developer`
+roles.
+`stream()` adds the prompt and the accumulated response to history once the
+stream is consumed fully; an interrupted stream is not recorded as a completed
+turn. Call `clear_history()` to discard conversation turns while retaining the
+initial system prompt.
 
 The clients make synchronous network requests. Provider SDK/API errors are
 propagated to the caller; configure retries or error handling in the
-application as needed. If a non-text response is returned from `invoke()`,
+application as needed. If a non-text response is returned from `think()`,
 the client raises `RuntimeError`.
+
+## Extending the model base
+
+`BaseChatModel` in `luckybrain.core.models` centralizes configuration
+validation, text-message handling, conversation history, and the `think()` and
+`stream()` methods. A custom synchronous provider adapter can
+subclass it and implement `_complete(messages)` and `_stream(messages)` for its
+SDK. Model identifiers are passed through to the provider rather than checked
+against a hard-coded catalog. `OpenaiBrain` can also target an OpenAI-compatible
+endpoint with `base_url`.
 
 ## Current scope
 
 - The clients do not perform retrieval, prompt templating, or persistence.
 - Conversation history is held only in process memory and is not thread-safe.
-- Streaming does not yield usage metadata or update conversation history.
+- Streaming does not yield usage metadata. Stream history updates only after
+  complete consumption of the iterator.
 - The clients require their respective provider SDKs, which are declared as
   LuckyBrain runtime dependencies.

@@ -29,6 +29,10 @@ or work within an existing folder to contribute.
    the problem, solution, important trade-offs, and how reviewers can verify
    it. Respond to review feedback and update the pull request until it is ready.
 
+The `main` branch requires a pull request and approval from its code owner.
+Public contributors can suggest changes, but they cannot directly change the
+published website or merge their own changes.
+
 Example branch names: `fix/document-validation`,
 `feat/image-input-contract`, or `docs/contributor-guide`.
 
@@ -54,6 +58,15 @@ too: describe the existing problem, the corrected behavior, and add a
 regression test when practical. Do not add a dependency or public abstraction
 without a concrete use case. Clearly label experimental behavior and proposals;
 documentation and examples must not imply that unimplemented features work.
+
+Every new or changed public feature must be documented alongside its code:
+write useful module, class, and public-method docstrings; explain constructor
+parameters, return values, errors, side effects, and limitations in a user
+guide; and add its public symbols to the generated [API reference](docs/api-reference.md)
+when needed. Build the site locally with `python -m mkdocs build --strict` after
+installing the `docs` extra. The API pages are rendered from current source
+docstrings and signatures, so keep both the code and the user guide current in
+the same pull request.
 
 ## Set up a development environment
 
@@ -104,7 +117,12 @@ Before requesting review, check that:
 
 - [ ] The change addresses a clear problem and stays focused.
 - [ ] Tests cover changed behavior; all relevant checks pass.
+- [ ] Changes to `main` are submitted in a pull request and approved by the
+  repository code owner.
 - [ ] User-facing behavior, setup, and directly related docs are updated.
+- [ ] New public symbols have useful source docstrings and appear in the
+  generated API reference; user guides cover setup, parameters, behavior, and
+  limitations.
 - [ ] Public API or compatibility changes and limitations are explained.
 - [ ] External inputs and failures are handled explicitly; resource use is
   bounded where relevant.

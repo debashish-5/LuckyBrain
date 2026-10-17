@@ -1,0 +1,88 @@
+site_name: LuckyBrain
+site_description: Composable Python foundations for retrieval, agents, and model integrations.
+site_url: https://debashish-5.github.io/LuckyBrain/
+repo_url: https://github.com/debashish-5/LuckyBrain
+repo_name: debashish-5/LuckyBrain
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  logo: assets/favicon.svg
+  favicon: assets/favicon.svg
+  language: en
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.action.edit
+  palette:
+    - scheme: default
+      primary: white
+      accent: teal
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - src
+          options:
+            docstring_style: google
+            filters:
+              - "!^_"
+            heading_level: 2
+            inherited_members: true
+            merge_init_into_class: true
+            show_bases: true
+            show_root_heading: true
+            show_root_members_full_path: false
+            show_signature_annotations: true
+            show_source: false
+            summary: true
+
+nav:
+  - Home: index.md
+  - Documentation:
+      - Start here: getting-started.md
+      - Guides:
+          - Chat models: guides/chat-models.md
+          - Query rewriting: guides/query-rewriting.md
+          - RAG and agent contracts: guides/contracts.md
+          - Production readiness: guides/production-readiness.md
+          - Provider client details: provider-clients.md
+      - API reference: api-reference.md
+      - Architecture: architecture.md
+  - Project:
+      - About: about.md
+      - Roadmap: roadmap.md
+      - Code of conduct: code-of-conduct.md
+      - Contributing: contributing.md
+      - Security: security.md
+      - Connect: connect.md
+
+copyright: Copyright &copy; LuckyBrain contributors
