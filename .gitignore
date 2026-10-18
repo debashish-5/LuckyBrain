@@ -12,3 +12,4 @@ site/
 .env
 .env.*
 !.env.example
+doubt/
