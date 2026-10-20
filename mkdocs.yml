@@ -71,6 +71,7 @@ nav:
       - Start here: getting-started.md
       - Guides:
           - Chat models: guides/chat-models.md
+          - Prompt formatting: guides/prompt-formatting.md
           - Query rewriting: guides/query-rewriting.md
           - RAG and agent contracts: guides/contracts.md
           - Production readiness: guides/production-readiness.md

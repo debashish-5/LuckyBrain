@@ -69,6 +69,28 @@ answer. See the [chat models guide](docs/guides/chat-models.md) for setup and
 usage. Keep API keys out of source code and use environment variables or a
 secret manager.
 
+The project also includes a lightweight prompt templating helper for
+string-based model prompts:
+
+```python
+from luckybrain.prompts import PromptFormat
+
+prompt = PromptFormat(
+    "You are helping {role}. Summarize the key points for {audience}."
+)
+
+filled = prompt.format(role="researcher", audience="engineering leadership")
+print(filled)
+
+partial = prompt.partial(role="researcher")
+print(partial.format(audience="engineering leadership"))
+```
+
+`PromptFormat` validates required variables before formatting, supports
+`partial()` to fix values ahead of time, and can call a chat model directly via
+`think()`. See the [prompt templating guide](docs/guides/prompt-formatting.md)
+for full usage examples.
+
 The experimental [query rewriting helper](docs/guides/query-rewriting.md)
 accepts an existing synchronous chat model; it does not perform retrieval.
 
