@@ -49,6 +49,32 @@ user and assistant messages in this client instance. The
 [chat models guide](guides/chat-models.md) covers streaming, options,
 history, error behavior, and Groq.
 
+## Use prompt templates
+
+`PromptFormat` helps you keep prompt text reusable and validate required
+variables before sending a request:
+
+```python
+from luckybrain.prompts import PromptFormat
+
+prompt = PromptFormat(
+    "Summarize {topic} for a {audience} audience in {length} bullet points."
+)
+
+formatted = prompt.format(
+    topic="retrieval-augmented generation",
+    audience="technical",
+    length="three",
+)
+print(formatted)
+
+partial = prompt.partial(topic="retrieval-augmented generation")
+print(partial.format(audience="non-technical", length="five"))
+```
+
+This is useful when you want the same prompt skeleton across several requests
+without duplicating the template string or losing validation.
+
 ## Use a domain model
 
 `Document` and `RetrievalResult` are lightweight data types; they do not read
@@ -68,6 +94,7 @@ candidate = RetrievalResult(document=source, score=0.91)
 ## Where to go next
 
 - [Chat models](guides/chat-models.md) — provider setup and model parameters.
+- [Prompt templating](guides/prompt-formatting.md) — reusable prompts with validation.
 - [Query rewriting](guides/query-rewriting.md) — experimental query helper.
 - [RAG and agent contracts](guides/contracts.md) — implementing the async
   protocols yourself.
