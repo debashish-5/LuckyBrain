@@ -71,3 +71,11 @@ class QueryRewriting:
         )
         lines = self.model.think(prompt).splitlines()
         return [line.strip("-•* \t") for line in lines if line.strip()][:n]
+
+    def StepBackPrompting(self,query): 
+        step_back_prompt = f"""
+            ## system 
+            You are an expert analyst. Answer the user's question by applying the general background principle or rule provided.
+            ## user 
+            General Principle Context:\n{query}\n\nOriginal Question: {question}\n\nDetailed Answer:
+        """
