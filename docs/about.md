@@ -9,10 +9,10 @@ framework.
 ## What exists today
 
 The package is at an early stage. Current code includes small domain models,
-synchronous OpenAI and Groq chat clients, a model-backed query rewriting
-helper, and asynchronous protocols for RAG and agent-tool integrations. The
-protocols are contracts only: complete retrieval and agent pipelines are not
-included.
+synchronous OpenAI and Groq chat clients, a lightweight prompt templating
+helper, a model-backed query rewriting helper, and asynchronous protocols for
+RAG and agent-tool integrations. The protocols are contracts only: complete
+retrieval and agent pipelines are not included.
 
 ## Project principles
 
