@@ -6,6 +6,7 @@ import pytest
 from luckybrain import Document, RetrievalResult
 from luckybrain.core import models
 from luckybrain.core.models import BaseChatModel, GroqBrain, OpenaiBrain
+from luckybrain.prompts import PromptFormat
 
 
 def test_document_keeps_metadata_and_has_independent_defaults() -> None:
@@ -33,6 +34,32 @@ def test_retrieval_result_keeps_document_and_score() -> None:
 
     assert result.document is document
     assert result.score == 0.92
+
+
+def test_prompt_format_supports_partial_values_and_model_calls() -> None:
+    prompt = PromptFormat("Explain {topic} for a {audience} audience in {length} sentences.")
+
+    assert prompt.format(
+        topic="retrieval",
+        audience="technical",
+        length="three",
+    ) == "Explain retrieval for a technical audience in three sentences."
+
+    partial = prompt.partial(topic="retrieval")
+    assert partial.format(audience="technical", length="three") == (
+        "Explain retrieval for a technical audience in three sentences."
+    )
+
+    class FakeBrain:
+        def think(self, message: str) -> str:
+            return message
+
+    assert prompt.think(FakeBrain(), topic="retrieval", audience="technical", length="three") == (
+        "Explain retrieval for a technical audience in three sentences."
+    )
+
+    with pytest.raises(ValueError, match="Missing variables"):
+        prompt.format(topic="retrieval", audience="technical")
 
 
 class FakeCompletions:
