@@ -28,7 +28,13 @@ guides for complete examples, parameter explanations, and operational advice.
 
 ::: luckybrain.rag.chunking.DocumentChunker
 
+::: luckybrain.rag.memory.MemoryVectorRetriever
+
 ::: luckybrain.rag.protocols.Retriever
+
+::: luckybrain.rag.protocols.VectorEmbedder
+
+::: luckybrain.rag.protocols.VectorStore
 
 ::: luckybrain.rag.protocols.Reranker
 

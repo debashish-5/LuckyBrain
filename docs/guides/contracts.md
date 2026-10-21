@@ -2,8 +2,9 @@
 
 The RAG and agent modules define Python `Protocol` interfaces. They describe
 what application-owned adapters should provide. LuckyBrain also includes a
-deterministic document chunker; retrievers, rerankers, generators, agent
-runners, and built-in tools are not included.
+deterministic document chunker and an in-memory vector retriever; durable
+vector stores, rerankers, generators, agent runners, and built-in tools are
+not included.
 
 ## RAG
 
@@ -13,7 +14,14 @@ Import the chunker and contracts from `luckybrain.rag`:
 from collections.abc import Sequence
 
 from luckybrain import Document, RetrievalResult
-from luckybrain.rag import DocumentChunker, Generator, Reranker, Retriever
+from luckybrain.rag import (
+    DocumentChunker,
+    Generator,
+    MemoryVectorRetriever,
+    Reranker,
+    Retriever,
+    VectorEmbedder,
+)
 
 
 class InMemoryRetriever:
@@ -33,6 +41,14 @@ IDs, copied source metadata, chunk indices, and half-open character offsets
 into the original content. It prefers paragraph, sentence, and word boundaries
 when possible. The limits are characters, not tokens; use a tokenizer-aware
 adapter when a model's token budget requires one.
+
+`VectorEmbedder` describes the asynchronous document/query embedding boundary.
+`MemoryVectorRetriever` implements that interface alongside `Retriever`; add
+documents with `await retriever.add_documents(chunks)` and query with
+`await retriever.retrieve("search terms", top_k=5)`. It ranks by cosine
+similarity, replaces entries with duplicate document IDs, and keeps stable
+insertion order for tied scores. It is intentionally in-memory and not a
+durable or concurrent-writer store.
 
 `Retriever.retrieve(query, *, top_k=10)` returns ranked
 `RetrievalResult` objects. `Reranker.rerank(query, results)` returns candidates
