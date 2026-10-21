@@ -10,13 +10,16 @@ controls.
 - Validates basic text prompts and several chat-model configuration values.
 - Wraps synchronous OpenAI and Groq chat-completions calls and propagates SDK
   errors.
-- Defines minimal document, retrieval result, RAG, and tool contracts.
+- Defines document, retrieval result, RAG, and tool contracts; source-aware
+  text chunking; and citation-preserving context assembly.
+- Offers optional local text embeddings, an async embedding adapter, a
+  small in-memory cosine retriever, and a local file-based embedding index.
 - Provides an experimental model-backed query-rewriting helper.
 
 ## What it does not provide
 
-- A RAG pipeline, database, vector store, embedding model, orchestration loop,
-  tool executor, or durable conversation store.
+- A complete RAG pipeline, durable database or vector store, orchestration
+  loop, tool executor, or durable conversation store.
 - Shared timeout, retry, backoff, rate-limit, concurrency, or cancellation
   management across provider calls.
 - Authentication or authorization for application users; per-user isolation;
@@ -25,6 +28,8 @@ controls.
   guarantees of factual accuracy.
 - A stable compatibility policy, production SLA, or guarantee that provider
   model IDs and options remain available.
+- Token-aware chunking, model identity checks when loading local embedding
+  index files, or safe deserialization of untrusted index files.
 
 ## Before deployment
 

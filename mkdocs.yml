@@ -74,6 +74,7 @@ nav:
           - Prompt formatting: guides/prompt-formatting.md
           - Query rewriting: guides/query-rewriting.md
           - RAG and agent contracts: guides/contracts.md
+          - Text embeddings: guides/embeddings.md
           - Production readiness: guides/production-readiness.md
           - Provider client details: provider-clients.md
       - API reference: api-reference.md

@@ -51,6 +51,10 @@ similarity, replaces entries with duplicate document IDs, and keeps stable
 insertion order for tied scores. It is intentionally in-memory and not a
 durable or concurrent-writer store.
 
+To connect a local Sentence Transformers model to this async retriever, see
+the [embedding guide](embeddings.md). The CPU-bound synchronous model is
+adapted through a worker thread.
+
 `CitationContextBuilder.assemble(results)` creates labeled source sections and
 a structured source map containing each document ID, score, and metadata.
 Repeated document IDs appear once. Set `max_characters` to bound the context;

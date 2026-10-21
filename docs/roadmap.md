@@ -12,6 +12,8 @@ This roadmap records direction, not delivery promises. Issues and design discuss
 
 - [x] Add source-aware character chunking and in-memory cosine retrieval with
   async embedder and vector-store contracts.
+- [x] Provide optional local text embeddings and a non-blocking adapter for
+  asynchronous retrieval.
 - [ ] Define ingestion, chunking, embedding, and vector-store adapter contracts for durable integrations.
 - [ ] Build a full composable retrieval pipeline with deterministic test adapters.
 - [x] Preserve document identity, metadata, and citations through context assembly.

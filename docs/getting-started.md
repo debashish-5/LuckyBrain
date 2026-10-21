@@ -98,5 +98,7 @@ candidate = RetrievalResult(document=source, score=0.91)
 - [Query rewriting](guides/query-rewriting.md) — experimental query helper.
 - [RAG and agent contracts](guides/contracts.md) — implementing the async
   protocols yourself.
+- [Text embeddings](guides/embeddings.md) — install and connect the optional
+  local embedding model and in-memory vector index.
 - [API reference](api-reference.md) — signatures and documentation generated
   directly from source.

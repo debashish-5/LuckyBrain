@@ -24,7 +24,17 @@ guides for complete examples, parameter explanations, and operational advice.
 
 ::: luckybrain.core.models.GroqBrain
 
-## Retrieval and generation protocols
+## Text embeddings
+
+::: luckybrain.embeddings.embedding.Embedding
+
+::: luckybrain.embeddings.embedding.HFEmbedder
+
+::: luckybrain.embeddings.embedding.AsyncEmbeddingAdapter
+
+::: luckybrain.embeddings.embedding.EmbeddingIndex
+
+## Retrieval and generation
 
 ::: luckybrain.rag.chunking.DocumentChunker
 
@@ -60,6 +70,7 @@ it is not re-exported from the package root.
 ## Re-exported names
 
 The package root exports `Document` and `RetrievalResult`. The `luckybrain.rag`
-module exports `Retriever`, `Reranker`, and `Generator`; `luckybrain.agents`
-exports `AgentTool`. Provider clients and experimental query rewriting must be
-imported from the module paths shown above.
+module exports its RAG components and protocols; `luckybrain.embeddings`
+exports the embedding interfaces and implementations; and `luckybrain.agents`
+exports `AgentTool`. Provider clients and experimental query rewriting must
+be imported from the module paths shown above.

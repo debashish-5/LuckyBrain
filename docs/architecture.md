@@ -10,6 +10,11 @@ the operational controls that make these systems dependable.
 The package is at an early stage. It currently includes:
 
 - Provider-neutral `Document` and `RetrievalResult` domain models.
+- Source-aware character chunking and citation-aware context assembly.
+- Optional local Sentence Transformers embeddings, a JSON/NumPy file-backed
+  embedding index, and an async adapter for embedding models.
+- An in-memory cosine-similarity retriever that consumes the async embedder
+  contract.
 - Asynchronous extension protocols for text retrieval, reranking, and
   generation in `luckybrain.rag`.
 - An asynchronous tool contract in `luckybrain.agents`.
@@ -17,12 +22,13 @@ The package is at an early stage. It currently includes:
 - An experimental model-backed query rewriting helper in
   `luckybrain.query_imp.queryimproval`.
 
-These pieces are not a connected application pipeline. In particular, the
-protocols do not provide implementations, and the chat clients do not perform
-retrieval, multimodal processing, agent orchestration, or citation management.
-See the [chat models guide](guides/chat-models.md), [query rewriting
-guide](guides/query-rewriting.md), and [API reference](api-reference.md) for
-current behavior and boundaries.
+These pieces are not a complete connected application pipeline. The in-memory
+retriever and local embedding index are prototype-scale, process/local-file
+components rather than durable databases. The chat clients do not perform
+retrieval, multimodal processing, or agent orchestration. See the [chat models
+guide](guides/chat-models.md), [embedding guide](guides/embeddings.md),
+[query rewriting guide](guides/query-rewriting.md), and [API
+reference](api-reference.md) for current behavior and boundaries.
 
 ## Composable system lifecycle
 

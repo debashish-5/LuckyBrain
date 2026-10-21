@@ -14,10 +14,12 @@ replaceable, testable, and safer to build with—without tying the project to on
 provider or one fixed architecture.
 
 > **Project status: alpha.** Today the package contains lightweight domain
-> models, extension protocols, synchronous OpenAI and Groq chat clients, and an
-> experimental query-rewriting helper. Complete RAG, agent, and multimodal
-> pipelines are not implemented. APIs and architecture may change as the
-> project develops.
+> models, source-aware text chunking, a citation context builder, in-memory
+> vector retrieval, optional local embeddings, asynchronous agent/RAG
+> protocols, synchronous OpenAI and Groq chat clients, and an experimental
+> query-rewriting helper. A complete RAG pipeline, durable vector database,
+> agent runner, and multimodal pipeline are not implemented. APIs and
+> architecture may change as the project develops.
 
 ## What belongs here?
 
@@ -93,6 +95,11 @@ for full usage examples.
 
 The experimental [query rewriting helper](docs/guides/query-rewriting.md)
 accepts an existing synchronous chat model; it does not perform retrieval.
+
+Optional local text embeddings and a small cosine-similarity index are
+available with `python -m pip install -e ".[embeddings]"`. See the
+[embedding guide](docs/guides/embeddings.md) for model setup and a complete
+connection to the asynchronous in-memory retriever.
 
 ## A flexible project, not a fixed folder map
 
