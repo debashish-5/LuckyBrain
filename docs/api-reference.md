@@ -28,6 +28,12 @@ guides for complete examples, parameter explanations, and operational advice.
 
 ::: luckybrain.rag.chunking.DocumentChunker
 
+::: luckybrain.rag.context.CitationContextBuilder
+
+::: luckybrain.rag.context.CitationSource
+
+::: luckybrain.rag.context.ContextAssembly
+
 ::: luckybrain.rag.memory.MemoryVectorRetriever
 
 ::: luckybrain.rag.protocols.Retriever

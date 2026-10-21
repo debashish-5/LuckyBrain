@@ -14,7 +14,8 @@ This roadmap records direction, not delivery promises. Issues and design discuss
   async embedder and vector-store contracts.
 - [ ] Define ingestion, chunking, embedding, and vector-store adapter contracts for durable integrations.
 - [ ] Build a full composable retrieval pipeline with deterministic test adapters.
-- [ ] Preserve document identity, metadata, and citations through context assembly and answers.
+- [x] Preserve document identity, metadata, and citations through context assembly.
+- [ ] Preserve source citations in generated answers.
 - [ ] Add evaluation datasets and repeatable retrieval and answer-quality metrics.
 - [ ] Add optional adapters for commonly used storage and model providers.
 

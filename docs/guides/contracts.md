@@ -16,6 +16,7 @@ from collections.abc import Sequence
 from luckybrain import Document, RetrievalResult
 from luckybrain.rag import (
     DocumentChunker,
+    CitationContextBuilder,
     Generator,
     MemoryVectorRetriever,
     Reranker,
@@ -49,6 +50,14 @@ documents with `await retriever.add_documents(chunks)` and query with
 similarity, replaces entries with duplicate document IDs, and keeps stable
 insertion order for tied scores. It is intentionally in-memory and not a
 durable or concurrent-writer store.
+
+`CitationContextBuilder.assemble(results)` creates labeled source sections and
+a structured source map containing each document ID, score, and metadata.
+Repeated document IDs appear once. Set `max_characters` to bound the context;
+if a source is cut off, its source-map entry is marked `truncated`, and lower
+ranked sources are omitted. The limit counts characters, not model tokens.
+The builder preserves provenance but does not verify claims or make untrusted
+document text safe for prompts.
 
 `Retriever.retrieve(query, *, top_k=10)` returns ranked
 `RetrievalResult` objects. `Reranker.rerank(query, results)` returns candidates

@@ -1,6 +1,7 @@
 """Contracts for retrieval-augmented generation components."""
 
 from luckybrain.rag.chunking import DocumentChunker
+from luckybrain.rag.context import CitationContextBuilder, CitationSource, ContextAssembly
 from luckybrain.rag.memory import MemoryVectorRetriever
 from luckybrain.rag.protocols import (
     Generator,
@@ -12,6 +13,9 @@ from luckybrain.rag.protocols import (
 
 __all__ = [
     "DocumentChunker",
+    "CitationContextBuilder",
+    "CitationSource",
+    "ContextAssembly",
     "Generator",
     "MemoryVectorRetriever",
     "Reranker",
