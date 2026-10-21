@@ -1,18 +1,19 @@
-# RAG and agent contracts
+# RAG and agent components
 
 The RAG and agent modules define Python `Protocol` interfaces. They describe
-what application-owned adapters should provide; LuckyBrain does not currently
-include retrievers, rerankers, generators, agent runners, or built-in tools.
+what application-owned adapters should provide. LuckyBrain also includes a
+deterministic document chunker; retrievers, rerankers, generators, agent
+runners, and built-in tools are not included.
 
 ## RAG
 
-Import the contracts from `luckybrain.rag`:
+Import the chunker and contracts from `luckybrain.rag`:
 
 ```python
 from collections.abc import Sequence
 
 from luckybrain import Document, RetrievalResult
-from luckybrain.rag import Generator, Reranker, Retriever
+from luckybrain.rag import DocumentChunker, Generator, Reranker, Retriever
 
 
 class InMemoryRetriever:
@@ -21,7 +22,17 @@ class InMemoryRetriever:
             raise ValueError("top_k must be positive")
         document = Document(id="example", content=f"Matched: {query}")
         return [RetrievalResult(document=document, score=1.0)][:top_k]
+
+
+source = Document(id="handbook", content="A long source document...", metadata={"path": "guide.md"})
+chunks = DocumentChunker(chunk_size=500, chunk_overlap=60).split(source)
 ```
+
+`DocumentChunker.split(document)` returns new `Document` values with stable
+IDs, copied source metadata, chunk indices, and half-open character offsets
+into the original content. It prefers paragraph, sentence, and word boundaries
+when possible. The limits are characters, not tokens; use a tokenizer-aware
+adapter when a model's token budget requires one.
 
 `Retriever.retrieve(query, *, top_k=10)` returns ranked
 `RetrievalResult` objects. `Reranker.rerank(query, results)` returns candidates

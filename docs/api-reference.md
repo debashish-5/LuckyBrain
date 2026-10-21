@@ -26,6 +26,8 @@ guides for complete examples, parameter explanations, and operational advice.
 
 ## Retrieval and generation protocols
 
+::: luckybrain.rag.chunking.DocumentChunker
+
 ::: luckybrain.rag.protocols.Retriever
 
 ::: luckybrain.rag.protocols.Reranker
