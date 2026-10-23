@@ -232,3 +232,5 @@ class TableExtractor:
     @staticmethod
     def save_json(tables, out_path): 
         Path(out_path).write_text(json.dumps(tables, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        
