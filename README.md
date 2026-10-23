@@ -33,10 +33,9 @@ provider or one fixed architecture.
 ## See LuckyBrain
 
 <div align="center">
-  <video src="https://raw.githubusercontent.com/debashish-5/LuckyBrain/main/video_for_readme/ascii-magic-1.mp4" controls width="100%">
+  <video src="https://debashish-5.github.io/LuckyBrain/video_for_readme/ascii-magic-1.mp4" controls preload="metadata" width="100%">
     Your browser does not support embedded video.
   </video>
-  <p><sub><a href="https://raw.githubusercontent.com/debashish-5/LuckyBrain/main/video_for_readme/ascii-magic-1.mp4">Open or download the demo video</a></sub></p>
 </div>
 
 ## Get started

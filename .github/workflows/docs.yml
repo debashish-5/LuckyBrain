@@ -24,6 +24,9 @@ jobs:
           python-version: "3.13"
       - run: uv sync --extra docs --no-dev
       - run: uv run mkdocs build --strict
+      - run: |
+          mkdir -p site/video_for_readme
+          cp video_for_readme/ascii-magic-1.mp4 site/video_for_readme/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
