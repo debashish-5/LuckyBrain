@@ -122,4 +122,72 @@ class Tool:
         args = {k: self._coerce(k, v) for k, v in args.items()}
         return self.func(**args)
 
-    
+
+    def run(self,args= None): 
+        """Like invoke, but always returns a string and never raises (safe for LLMs)"""
+        try: 
+            result = self.pull(args=args)
+        except Exception as e: 
+            return f"Error: {e}"
+        return result if isinstance(result,str) else json.dumps(result, default=True, ensure_ascii=False)
+
+    def __call__(self, *args, **kwargs):
+        return self.func(*args,**kwargs)
+
+    def __repr__(self): 
+        return f"Tool({self.name!r})"
+
+
+def tool(func=None,*, name=None, description=None): 
+    """Use as @tool or @tool(name="x",descrtiption="...")"""
+    if func is None: 
+        return lambda f:Tool(f,name=name,description=description)
+    return Tool(func=func)
+
+
+
+
+class ToolAgent:
+    """Lets a brain call tools in a loop until it has a final answer."""
+
+    def __init__(self, brain, tools, max_steps=5):
+        self.brain = brain
+        self.tools = {t.name: t for t in tools}
+        self.max_steps = max_steps
+
+    def run(self, prompt, verbose=False):
+        messages = self.brain._messages(prompt)
+        schemas = [t.schema for t in self.tools.values()]
+
+        for _ in range(self.max_steps):
+            msg = self.brain.client.chat.completions.create(
+                model=self.brain.model,
+                temperature=self.brain.temperature,
+                messages=messages,
+                tools=schemas,
+            ).choices[0].message
+
+            if not msg.tool_calls:
+                return msg.content
+
+            messages.append({
+                "role": "assistant",
+                "content": msg.content or "",
+                "tool_calls": [
+                    {"id": c.id, "type": "function",
+                     "function": {"name": c.function.name, "arguments": c.function.arguments}}
+                    for c in msg.tool_calls
+                ],
+            })
+            for call in msg.tool_calls:
+                tool_ = self.tools.get(call.function.name)
+                try:
+                    args = json.loads(call.function.arguments or "{}")
+                except json.JSONDecodeError:
+                    args, tool_ = {}, None
+                result = tool_.run(args) if tool_ else f"Error: cannot run tool '{call.function.name}'"
+                if verbose:
+                    print(f"[tool] {call.function.name}({args}) -> {result}")
+                messages.append({"role": "tool", "tool_call_id": call.id, "content": result})
+
+        return "Stopped: too many tool steps."
