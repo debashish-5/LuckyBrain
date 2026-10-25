@@ -12,6 +12,18 @@ from groq.types.chat import ChatCompletionMessageParam as GroqChatCompletionMess
 from openai import OpenAI
 from openai.types.chat import ChatCompletionMessageParam as OpenAIChatCompletionMessageParam
 
+from messages.messages import to_dicts
+
+def _messages(self, prompt):
+    if isinstance(prompt, str):
+        messages = [{"role": "user", "content": prompt}]
+    else:
+        messages = to_dicts(prompt)        # works with objects, dicts, or a mix
+
+    if self.system_prompt and messages[0]["role"] != "system":
+        messages.insert(0, {"role": "system", "content": self.system_prompt})
+    return messages
+
 
 class ChatMessage(TypedDict):
     """A text-based chat message accepted by the built-in clients."""
