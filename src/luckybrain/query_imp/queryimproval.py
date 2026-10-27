@@ -77,5 +77,46 @@ class QueryRewriting:
             ## system 
             You are an expert analyst. Answer the user's question by applying the general background principle or rule provided.
             ## user 
-            General Principle Context:\n{query}\n\nOriginal Question: {question}\n\nDetailed Answer:
+            General Principle Context:\n{query}\n\nOriginal Question: {query}\n\nDetailed Answer:
         """
+
+    def Practicalquerybuilder(self,query): 
+        """Let's impove the input query more effective towards practical use case"""
+        prompt = f"""You a query improver to towards more focuses on practical use case and also with theory,
+                    - The improvement by you, must given accurate of result of user need.
+                    <query>
+                    {query}
+                    </query>
+        """
+        result = self.model.think(prompt)
+        return result
+
+    ## use next comming Q-IMP when you have connect tool with model
+    def FalseGradeQuery(self,query): 
+        force_prompt = f"""
+        # False Grade Query Improver. 
+        -> Generate Query' answer with false grade query,
+        ### THE Challenging part is you answer will be mixing with wrong concept which is used to again procced to llm making high strong answer. 
+            + Keep the Main word towards Answer Focus, 
+            + make the concept wrong
+            + Because here i again procced to llm to make evaluate, resoning the wrong asusmption answer to high quality deep answer.
+        ### query
+           - {query}
+        """
+
+        wrong_assumption = self.model.think(force_prompt)
+        prompt = f"""
+        # Hi Mr. Evaluator. Please evaluate the query with respect their actual answer.
+        - Here the Context was wrong please correct & add more next context/answer about the about query 
+        <query>
+        {query}
+        </query>
+
+        <context> 
+        {wrong_assumption}
+        </context>
+
+        """
+        answer = self.model.think(wrong_assumption)
+        return answer
+    
