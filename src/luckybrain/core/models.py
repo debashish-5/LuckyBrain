@@ -11,7 +11,7 @@ from groq import Groq
 from groq.types.chat import ChatCompletionMessageParam as GroqChatCompletionMessageParam
 from openai import OpenAI
 from openai.types.chat import ChatCompletionMessageParam as OpenAIChatCompletionMessageParam
-
+import ollama
 from messages.messages import to_dicts
 
 def _messages(self, prompt):
@@ -293,3 +293,83 @@ class GroqBrain(BaseChatModel):
         for chunk in response_stream:
             if chunk.choices and (content := chunk.choices[0].delta.content) is not None:
                 yield content
+
+
+
+
+
+class OllamaBrain(BaseChatModel): 
+    """Synchronous chat client for local or cloud Ollama models."""
+    # Passed to Ollama as top-level arguments; every other extra parameter goes into `options`.
+    _TOP_LEVEL_PARAMS = frozenset({"format", "keep_alive", "think"})
+    def __init__(
+            self,
+            model:str = "mistral", 
+            api_key: str | None = None, 
+            temperature: float | None = None, 
+            system_prompt: str = "You are a helpful assistant", 
+            max_tokens: int | None = None, 
+            top_p: float | None = None, 
+            host: str | None = None, 
+            **additional_params: Any
+    ) -> None: 
+        super().__init__(
+            model = model, 
+            api_key=api_key, 
+            temperature=temperature, 
+            system_prompt=system_prompt, 
+            max_tokens=max_tokens, 
+            top_p=top_p, 
+            host = host, 
+            **additional_params
+        )
+        api_key = api_key or os.getenv("OLLAMA_API_KEY")
+        client_kwargs:dict[str,Any] = {}
+        if api_key: 
+            client_kwargs["headers"] = {"Authorization": f"Bearer {api_key}"}
+        self.client = ollama.Client(host=host, **client_kwargs)
+
+     def _chat_kwargs(self,messages:list[ChatMessage]) -> dict[str,Any]: 
+        params = dict(self.request_params)
+        options = dict(params.pop("options",None) or {})
+        if self.temperature is None:
+            options['temperature'] = self.temperature
+        if 'max_tokens' in params:
+            options['num_predict'] = params.pop("max_tokens")
+        top_level = {key:params.pop(key) for key in self._TOP_LEVEL_PARAMS & params.keys()}
+        options.update(params)
+        kwargs:dict[str,Any] = {
+            "model":self.model,
+            "messages":[
+                {
+                    "role":"system" if m['role'] == "devloper" else m['role'], "content":m['content']
+                } for m in messages
+            ], **top_level
+        }
+        if options:
+            kwargs['option'] = options
+        return kwargs
+
+    def _error(self, error: ollama.ResponseError) -> RuntimeError:
+        if error.status_code == 404:
+            return RuntimeError(f"Ollama model {self.model!r} not found. Run: ollama pull {self.model}")
+        return RuntimeError(f"Ollama error ({error.status_code}): {error.error}")
+
+    def _complete(self, messages:list[ChatMessage]) -> str: 
+        try: 
+            response = self.client.chat(**self._chat_kwargs(messages))
+        except ollama.ResponseError as error: 
+            raise self._error(error) from error
+        answer = response.message.content   
+        if not isinstance(response,str): 
+            raise RuntimeError("The Ollama response did not contain text.")
+        return answer
+
+    def _stream(self, messages:list[ChatMessage]) -> str: 
+        try: 
+            for chunk in self.client.chat(**self._chat_kwargs(messages=messages),stream=True):
+                if content := chunk.message.content: 
+                    yield content
+        except Exception as error: 
+            raise self._error(error=error) from error
+        
