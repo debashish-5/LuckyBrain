@@ -1,7 +1,7 @@
 import faiss
 import numpy as np
-
-
+from pathlib import Path
+import json
 class FAISSStore: 
     """Vector store: text chunks + metadata + FAISS index.
     index_type="flat"  exact search, supports delete (best up to ~100k chunks)
@@ -91,8 +91,32 @@ class FAISSStore:
         ids = [i for i,item in self.items.items() if all(item.get(k)== v for k,v in where.items())]
         return self.delete(ids)
 
+    #save and load 
+    def save(self,folder): 
+        folder = Path(folder)
+        folder.mkdir(parents=True, exist_ok=True)
+        faiss.write_index(self.index,str(folder/"index.faiss"))
+        data = {
+            "index_type":self.index_type, 
+            "next_id":self._next_id, 
+            "model":getattr(self.embedder, "model_name", None), 
+            "items":{str(i):item for i, item in self.items.items()}
+        }
+        (folder/"item.json").write_text(json.dumps(data,ensure_ascii=True), encoding="utf-8")
 
-
+    @classmethod
+    def load(cls,folder,embedder): 
+        """Use the SAME embedding model that built the store."""
+        data = json.loads((folder/"items.faiss").read_text(encoding="utf-8"))
+        index = faiss.read_index(str(folder / "index.faiss"))
+        if index.d != embedder.dimension: 
+            raise ValueError(f"Embedder dimension {embedder.dimension} does not match index ({index.d}). "
+                             f"Index was built with: {data.get('model')}")
+        store = cls.__new__(cls)
+        store.embedder, store.index,store.index_type = embedder,index,data['index_type']
+        store._next_id = data['next_id']
+        store.items = {int(i): item for i,item in data['items'].items()} 
+        return store
     
 
 
