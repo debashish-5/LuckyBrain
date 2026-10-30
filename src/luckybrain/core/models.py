@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from math import isfinite
-from typing import Any, Protocol, TypedDict, cast
+from typing import Any, Protocol, TypedDict, cast, Union, Optional
 
 from groq import Groq
 from groq.types.chat import ChatCompletionMessageParam as GroqChatCompletionMessageParam
@@ -13,6 +13,7 @@ from openai import OpenAI
 from openai.types.chat import ChatCompletionMessageParam as OpenAIChatCompletionMessageParam
 import ollama
 from messages.messages import to_dicts
+import anthropic
 
 def _messages(self, prompt):
     if isinstance(prompt, str):
@@ -329,7 +330,7 @@ class OllamaBrain(BaseChatModel):
             client_kwargs["headers"] = {"Authorization": f"Bearer {api_key}"}
         self.client = ollama.Client(host=host, **client_kwargs)
 
-     def _chat_kwargs(self,messages:list[ChatMessage]) -> dict[str,Any]: 
+    def _chat_kwargs(self,messages:list[ChatMessage]) -> dict[str,Any]: 
         params = dict(self.request_params)
         options = dict(params.pop("options",None) or {})
         if self.temperature is None:
@@ -365,11 +366,80 @@ class OllamaBrain(BaseChatModel):
             raise RuntimeError("The Ollama response did not contain text.")
         return answer
 
-    def _stream(self, messages:list[ChatMessage]) -> str: 
+    def _stream(self, messages:list[ChatMessage]) -> Iterator[str]: 
         try: 
             for chunk in self.client.chat(**self._chat_kwargs(messages=messages),stream=True):
                 if content := chunk.message.content: 
                     yield content
         except Exception as error: 
             raise self._error(error=error) from error
-        
+
+
+class ClaudeBrain(BaseChatModel): 
+    """Synchronous chat client for Anthropic Claude models."""
+    def __init__(
+            self,
+            model: str = "claude-sonnet-5.5", 
+            api_key: Union[str,None] = None, 
+            temperature: Union[float, None] = None, 
+            system_prompt: str = "You are helpful assistant.", 
+            max_tokens: Optional[int]= None, 
+            top_p:Union[float, None] = None, 
+            base_url: Union[str,None] = None,
+            **additional_params:Any
+    ) -> None: 
+        if temperature is not None and not 0 <= temperature <=1:
+            raise ValueError("Claude temperature must be between 0 to 1")
+        if "system" in additional_params: 
+            raise ValueError("Use system_prompt= ... instead of system=...")
+        super().__init__(
+            model = model, 
+            api_key = api_key, 
+            temperature=temperature, 
+            system_prompt=system_prompt, 
+            max_tokens=max_tokens, 
+            top_p=top_p, 
+            **additional_params
+        )
+        self.client = anthropic.Anthropic(
+            api_key=api_key or os.getenv("ANTHROPIC_API_KEY"), 
+            base_url=base_url
+        )
+
+    def _request(self,messages:list[ChatMessage]) -> dict[str, Any]: 
+        #        # Claude takes the system prompt separately, and only user/assistant turns in `messages`.
+        system = [m['content'] for m in messages if m["role"] in ('system','devloper')]
+        chat = [m for m in messages if m['role'] not in ('system', 'developer')]
+        if not chat: 
+            raise ValueError("At least one user message is required.")
+
+        kwargs:dict[str,Any] = {'model':self.model, 'messages':chat, **self.additional_params}
+
+        if system: 
+            kwargs['system'] = "\n\n".join(system)
+        if self.temperature is not None: 
+            kwargs['temperature'] = self.temperature
+        return kwargs
+
+
+    @staticmethod
+    def _error(error:anthropic.APIStatusError) -> RuntimeError: 
+        return RuntimeError(f"Anthropic API error ({error.status_code}): {error.message}")
+
+    def _complete(self,messages:list[ChatMessage]) -> str: 
+        try: 
+            response = self.client.messages.create(**self._request(messages=messages))
+        except anthropic.APIStatusError as error:
+            raise self._error(error=error) from error
+
+        answer = "".join(block.text for block in response.content if block.type== "text")
+        if not answer:
+            raise RuntimeError("The Claude response did not contain text.")
+        return answer
+
+    def _stream(self,messages:list[ChatMessage]) -> Iterator[str]: 
+        try: 
+            with self.client.messages.stream(**self._request(messages=messages)) as stream:
+                yield from stream.text_stream
+        except anthropic.APIStatusError as error:
+            raise self._error(error=error) from error
