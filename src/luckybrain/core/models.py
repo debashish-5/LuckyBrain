@@ -443,3 +443,35 @@ class ClaudeBrain(BaseChatModel):
                 yield from stream.text_stream
         except anthropic.APIStatusError as error:
             raise self._error(error=error) from error
+
+
+
+#Grok’s API (from xAI) is OpenAI-compatible, so this can reuse your OpenaiBrain. I’ll check the current model names first, since they change often.
+
+class GrokBrain(OpenaiBrain): 
+    def __init__(
+            self,
+            model: str = "grok-4.5", 
+            temperature: float | None = None, 
+            api_key: str | None = None, 
+            system_prompt: str = "you are a helpful assistant.", 
+            max_tokens: int | None = None, 
+            top_p: float | None = None, 
+            base_url: str | None = None, 
+            **additional_params:Any
+    ) -> None: 
+        api_key = api_key or os.getenv("XAI_API_KEY")
+        if not api_key:
+            # Without this check the OpenAI SDK would fall back to OPENAI_API_KEY
+            # and send your OpenAI key to xAI.
+            raise ValueError("xAI API key missing: pass api_key=... or set XAI_API_KEY.")
+        super().__init__(
+            model = model, 
+            temperature=temperature, 
+            api_key=api_key,
+            system_prompt=system_prompt, 
+            max_tokens=max_tokens, 
+            top_p=top_p, 
+            base_url=base_url or "https://api.x.ai/v1", 
+            **additional_params,
+        )
