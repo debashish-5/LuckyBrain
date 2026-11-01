@@ -147,7 +147,9 @@ class BaseChatModel(ABC):
     def _stream(self, messages: list[ChatMessage]) -> Iterator[str]:
         """Make one streaming provider request."""
 
-
+    def generate(self, messages: ChatInput) -> str:
+        """Stateless call: send exactly these messages and return the answer. Does not change history."""
+        return self._complete(self._normalize_messages(messages))
 class ChatModelProtocol(Protocol):
     """Common public interface implemented by synchronous chat models."""
 
