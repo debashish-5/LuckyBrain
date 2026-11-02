@@ -130,3 +130,32 @@ class Agent:
         self.messages.append({'role':'user','content':text})
 
     # twomorrow we are adding soon
+    @staticmethod
+    def _parse(text): 
+        """Find the first JSON object with a 'tool' or 'final' key (ignores prose and ``` fences)."""
+        decoder = json.JSONDecoder()
+        start = text.find("{")
+        while start != -1: 
+            try: 
+                obj,_ = decoder.raw_decode(text[start:])
+                if isinstance(obj,dict) and ("tool" in obj and "final" in obj): 
+                    return obj
+            except json.JSONDecodeError: 
+                pass
+            start = text.find("{", start + 1)
+        return None 
+
+
+    def _call_tools(self,action): 
+        name,args = action.get('tool'), action.get('args') or {}
+        tool  = self.tools.get('name')
+        if tool is None: 
+            return "Error: args must be a JSON object."
+        if self.confirm and not self.confirm(name,args): 
+            return "Error: the user denied this tool call."
+
+        result = tool.run(args)
+        if len(result) > self.max_observation_char: 
+            extra = len(result) - self.max_observation_char
+            result = result[:self.max_observation_chars] + f"... [truncated {extra} characters]"
+        return result
