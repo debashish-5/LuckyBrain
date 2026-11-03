@@ -117,7 +117,6 @@ class FAISSStore:
         store._next_id = data['next_id']
         store.items = {int(i): item for i,item in data['items'].items()} 
         return store
-    
 
 
                 
