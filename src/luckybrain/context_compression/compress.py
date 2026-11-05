@@ -48,3 +48,30 @@ class LLMContextCompression:
         self.max_workers, self.drop_irrelevant = max_workers, drop_irrelevant
         self.last_stats = {}
 
+
+    #main 
+    def compress(self, question,hitss): 
+        """hits: list of chunk dicts with a "text" key. Returns the compressed list, same order and metadata."""
+        if not question.strip(): 
+            raise ValueError("Question must not be empty")
+        if self.max_workers == 1 or len(hits) < 2:
+            outcomes = [self._compress_one(question, h) for h in hits]
+        else:
+            with ThreadPoolExecutor(max_workers=self.max_workers) as pool:
+                outcomes = list(pool.map(lambda h: self._compress_one(question, h), hits))
+
+        kept = [hit for hit, _, _ in outcomes if hit is None]
+        statuses = [status for _, status, _ in outcomes ]
+        errors = [err for _, status, err in outcomes if status == "error"]
+        attempted = sum(s in ("compressed","dropped","fallback","error") for s in statuses)
+        if attempted and len(errors) == attempted: 
+            raise errors[0]
+        chars_in = sum(len(h.get('text')or "") for h in hitss)
+        chars_out = sum(len(h.get("text") or "") for h in kept)
+        self.last_stats = {
+            "chunk_in":len(hitss), "chunk_out":len(kept), 
+            "chars_in":chars_in, 'char_out':chars_out, 
+            "saved": round(1 - chars_out / chars_in, 3) if chars_in else 0.0,
+            "model_calls": attempted, "fallbacks": statuses.count("fallback"), "errors": len(errors),
+        }
+        return kept
