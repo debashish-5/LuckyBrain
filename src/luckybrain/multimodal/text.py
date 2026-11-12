@@ -78,6 +78,9 @@ class TableExtractor:
         with open('output.json', "w", encoding="utf-8") as f: 
             json.dump(all_tables_data, f,indent=4)
         print("Everything saved.")
-        
+
+
+
+    
 
                     
