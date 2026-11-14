@@ -135,3 +135,7 @@ class TokenRegulator:
         if not hasattr(self.counter, "pieces"):
             raise NotImplementedError("This counter cannot show token pieces. Use TiktokenCounter.")
         return self.counter.pieces(text)
+
+
+    # soonnnonn
+    #sooneer 
